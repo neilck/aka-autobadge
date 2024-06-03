@@ -106,7 +106,7 @@ export const token = async (
 export const awardBadge = async (
   token: string,
   awarddata?: object
-): Promise<{ success: boolean; badgeAwardId: string } | undefined> => {
+): Promise<{ success: boolean; message: string }> => {
   if (!awardBadgeURL) {
     throw new Error("AKA_AWARD_BADGE_URL not set");
   }
@@ -118,7 +118,7 @@ export const awardBadge = async (
   );
   if (result === undefined) return result;
 
-  return result as { success: boolean; badgeAwardId: string };
+  return result as { success: boolean; message: string };
 };
 
 // award badge if eligible during user session
@@ -128,7 +128,7 @@ export const postAkaProfiles = async (
   url: string,
   token: string,
   data: object
-): Promise<object | undefined> => {
+): Promise<{ success: boolean; message: string; data?: {} }> => {
   console.log(
     `postAkaProfiles called. data: ${JSON.stringify(
       data
@@ -142,20 +142,23 @@ export const postAkaProfiles = async (
       cache: "no-cache",
     });
 
+    console.log(
+      `postAkaProfiles returned ${response.status} ${response.statusText}`
+    );
     if (response.status == 200) {
-      const json = await response.json();
-      console.log(
-        `postAkaProfiles returned ${response.status} ${response.statusText}`
-      );
-      console.log(`postAkaProfiles returned data ${JSON.stringify(json)}`);
-      return json;
+      const data = await response.json();
+      if (data) {
+        console.log(`postAkaProfiles returned data ${JSON.stringify(data)}`);
+      }
+      return { success: true, message: "", data: data };
     } else {
+      const statusCode = response.status;
       const text = await response.text();
-      throw new Error(
-        `postAkaProfiles returned ${response.status} ${response.statusText} ${text}`
-      );
+      const mesg = `${statusCode}  ${text}`;
+      console.log(mesg);
+      return { success: false, message: mesg };
     }
   } catch (myError) {
-    console.log(`Error during ${url} request: ${getErrorMessage(myError)}`);
+    return { success: false, message: getErrorMessage(myError) };
   }
 };
