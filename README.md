@@ -13,7 +13,7 @@ Simple button which awards the badge when clicked.
 1. Update `API_KEY` in `.env` file with your API key from [AKA Profiles](https://app.akaprofiles.com)
 2. Update `AES_KEY` in `.env` with a 256-bit, base64 encoded encryption key (See http://localhost:3000 to copy a random key).
 3. Start the development server (e.g. npm run dev)
-4. Create an auto badge in AKA Profiles and set the `Badge Award Page` to http://localhost:3000/simple
+4. Create an auto badge in [AKA Profiles - Auto Badges](https://app.akaprofiles.com/creator/badges) and set the `Badge Award Page` to http://localhost:3000/simple
 5. Open the `get badge link` in a browser
 
 [Simple auto badge configuration screenshot](simple.png)
@@ -27,8 +27,9 @@ Different auto badges can share the same badge award page, with unique behavour 
 
 ### Run Instructions
 
-Run steps 1 to 4 for simple badge above, then:
+Run steps 1 to 3 for simple badge above, then:
 
+4. Create an auto badge in [AKA Profiles - Auto Badges](https://app.akaprofiles.com/creator/badges) and set the `Badge Award Page` to http://localhost:3000/advanced
 5. Add Configuration Parameters: apikey = test123, includeAlias = true
 6. Add Data Fields: tier, alias
 7. Open the `get badge link` in a browser
