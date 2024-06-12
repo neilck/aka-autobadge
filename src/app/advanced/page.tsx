@@ -1,6 +1,7 @@
 /**
- * @file simple/page.tsx
- * @summary Simple badge award page example.
+ * @file advanced/page.tsx
+ * @summary Badge award page demonstrating more advanced features.
+ * @description Demonstrates using configuration parameters and including data on the badge award.
  */
 
 "use client";
@@ -8,9 +9,9 @@
 import styles from "../page.module.css";
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { load, LoadResult, doAwardBadge } from "./actions";
 
 import getErrorMessage from "../errors";
-import { load, LoadResult, doAwardBadge } from "./actions";
 
 export default function Simple() {
   const router = useRouter();
@@ -21,12 +22,16 @@ export default function Simple() {
   const [isValidSession, setIsValidSession] = useState(false); // true if code exchanged for token
   const [encryptedToken, setEncryptedToken] = useState(""); // token encrypted by server for safe client storage
   const [status, setStatus] = useState("loading...");
+
+  // configuration parameters returned in payload of token
+  const [tier, setTier] = useState("");
+  const [alias, setAlias] = useState("");
+  const [includeAlias, setIncludeAlias] = useState(false);
   const [badgeAwarded, setBadgeAwarded] = useState(false);
 
   const init = async () => {
     let loadResult: LoadResult = { isValidSession: false };
     try {
-      console.log(`Exchanged code ${code} for token...`);
       loadResult = await load(code);
     } catch (error) {
       const mesg = getErrorMessage(error);
@@ -34,20 +39,33 @@ export default function Simple() {
       setStatus(mesg);
       return;
     }
+
     console.log("encrypted token received.");
     setEncryptedToken(loadResult.encryptedToken ?? "");
     setIsValidSession(loadResult.isValidSession ?? false);
+
+    // configuration parameters
+    setTier(loadResult.tier ?? "");
+    const includeAlias = loadResult.includeAlias ?? false;
+    setIncludeAlias(includeAlias);
+
+    if (includeAlias) {
+      setAlias(loadResult.alias ?? "");
+    } else {
+      setAlias("<not enabled in configuration params>");
+    }
+
     if (loadResult.error) setStatus(loadResult.error ?? "");
-    else setStatus("load successful");
+    else setStatus("successfully loaded");
   };
 
   const readyToAward = () => {
-    // Add your own custom badge award logic here
+    // Add your own custom logic here
     return true;
   };
 
-  const awardBadge = async () => {
-    const result = await doAwardBadge(encryptedToken);
+  const awardBadge = async (tier: string, alias?: string) => {
+    const result = await doAwardBadge(encryptedToken, tier, alias);
     if (result.error) {
       setStatus(`badge not awarded: ${result.error}`);
     }
@@ -65,35 +83,34 @@ export default function Simple() {
       let mesg = "Awarding badge...";
       console.log(mesg);
       setStatus(mesg);
-      awardBadge();
+      if (includeAlias) {
+        awardBadge(tier, alias);
+      } else {
+        awardBadge(tier);
+      }
     }
   };
 
   const effectRan = useRef(false);
 
   useEffect(() => {
-    if (process.env.NODE_ENV == "development") {
-      // prevent running more than once in dev
-      if (!effectRan.current) {
-        init();
-      }
-      return () => {
-        effectRan.current = true;
-      };
-    } else {
+    if (
+      // run once in development enviroment
+      process.env.NODE_ENV == "development" &&
+      !effectRan.current
+    ) {
       init();
     }
+
+    return () => {
+      effectRan.current = true;
+    };
   }, []);
 
   return (
     <div className={styles.main}>
       <div className={styles.section}>
-        <p>
-          This is a simple badge award page for an an AKA Profiles auto badge.
-        </p>
-        <p>
-          <i>Open browser console to see log messages.</i>
-        </p>
+        This is an advanced badge award page for an an AKA Profiles auto badge.
       </div>
 
       <div className={styles.section}>
@@ -112,6 +129,18 @@ export default function Simple() {
             </button>
           </div>
         )}
+      </div>
+      <div className={styles.section}>
+        <p>
+          <b>Profile</b>
+        </p>
+        <p>
+          <b>Tier:</b> {tier}
+        </p>
+        <p>
+          <b>Alias:</b>{" "}
+          {includeAlias ? alias : "<excluded by config parameter>"}
+        </p>
       </div>
       <button disabled={!isValidSession || badgeAwarded} onClick={handleClick}>
         Award Badge to User

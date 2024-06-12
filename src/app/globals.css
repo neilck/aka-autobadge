@@ -38,6 +38,25 @@ li {
 }
 
 button {
-  padding: 8px
+  border: 2px solid #000080; /* Dark blue border */
+    background-color: #000080; /* Dark blue background */
+    color: #ffffff; /* White text */
+    padding: 10px 20px; /* Padding for the button */
+    font-size: 16px; /* Font size for the text */
+    border-radius: 5px; /* Optional: rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for hover effects */
+}
+
+button:hover {
+  border: 2px solid #4343d7; /* light blue border */
+  background-color: #4343d7; /* light background on hover */
+  color: #ffffff; /* white text on hover */
+}
+
+button:disabled {
+  border: 2px solid gray; /* light blue border */
+  background-color: gray; /* light background on hover */
+  color: #ffffff; /* white text on hover */
 }
 
