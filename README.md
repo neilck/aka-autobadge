@@ -2,7 +2,7 @@ This is the starting code for creating a badge award page for an AKA Profileas a
 
 ![Sample screens](aka-autobadge.png)
 
-See [AKA Profiles](https://www.akaprofiles.com) for more details.
+See [AKA Profiles](https://www.akaprofiles.com/docs/auto-badge-integration/overview) for more details.
 
 ## Simple Example (src/app/simple)
 
